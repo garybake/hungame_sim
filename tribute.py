@@ -8,8 +8,9 @@ class Tribute():
         self.alive = True
         self.district = int(id/2)
 
-    def kill(self):
+    def kill(self, reason=None):
         self.alive = False
+        self.death_reason = reason
 
     def __str__(self):
         alive = '_' if self.alive else 'X'
