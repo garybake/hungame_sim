@@ -13,5 +13,3 @@ Lead the team? (my guess)
 TODO
 Refactor out epoch
 Events
-Team split
-Fatigue
