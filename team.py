@@ -1,10 +1,13 @@
+import random
+
 
 class Team():
 
-    def __init__(self, members):
+    def __init__(self, members=None):
         self._tributes = []
-        for tribute in members:
-            self._tributes.append(tribute)
+        if members:
+            for tribute in members:
+                self._tributes.append(tribute)
 
     def __len__(self):
         return len(self._tributes)
@@ -38,8 +41,39 @@ class Team():
         return sum([t.strength for t in self])
 
     def merge_in_team(self, other_team):
+        print('* Merge {}:{} and {}:{} *'.format(self.strength, len(self), other_team.strength, len(other_team)))
         if other_team == self:
             return
         for t in other_team:
             mt = other_team.pop()
             self.append(mt)
+
+    def kill_team(self):
+        for t in self:
+            t.kill('Team death')
+
+    def split_team(self):
+        """
+        Split the team and kill the weaker split
+        """
+        if len(self) <= 1:
+            raise IndexError("Team too small")
+
+        t1 = Team()
+        t2 = Team()
+        for t in self:
+            if random.random() < 0.5:
+                t1.append(t)
+            else:
+                t2.append(t)
+
+        if (len(t1) == 0) or (len(t2) == 0):
+            # No split occured
+            return
+
+        if t1.strength > t1.strength:
+            t2.kill_team()
+            print('* Split {}:{} *vs* {}:{} t1 wins *'.format(t1.strength, len(t1), t2.strength, len(t2)))
+        else:
+            t1.kill_team()
+            print('* Split {}:{} *vs* {}:{} t2 wins *'.format(t1.strength, len(t1), t2.strength, len(t2)))
