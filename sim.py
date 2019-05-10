@@ -1,22 +1,15 @@
 import random
-import copy
+import math
 
 from tribute import Tribute
 from team import Team
 
 
-MAX_ENV_SURVIVE_CHANCE = 0.9
+ENV_ATTACK_PC = 0.01
+MAX_ENV_SURVIVE_PC = 0.99
 
-
-# class Epoch():
-#     def __init__(self, teams, tributes):
-#         self.teams = teams
-#         self.tributes = self.tributes
-
-#     def environment_death(self):
-#         for t in self.tributes:
-#             if random.random() < ENV_DEATH_CHANCE:
-#                 t.kill('Environment')
+TEAM_JOIN_START_PC = 0.9
+TEAM_JOIN_EPOCH_PC = 0.1
 
 
 class Sim():
@@ -38,14 +31,21 @@ class Sim():
         for t in self.tributes:
             new_team = Team([t])
             self.teams.append(new_team)
-        self.join_teams()
+        self.join_teams(pc_teams=TEAM_JOIN_START_PC)
 
-    def join_teams(self, join_count=4):
-        for i in range(join_count):
-            if len(self.teams) > 1:
-                t1 = random.choice(self.teams)
-                t2 = random.choice(self.teams)
-                t1.merge_in_team(t2)
+    def join_teams(self, pc_teams):
+        # pc_teams is the percent of teams to merge
+        team_count = len(self.teams)
+        if team_count > 1:
+            joins = math.ceil(team_count * pc_teams)
+            # Low number of teams forces joins to often
+            # so we use roll the dice
+            if joins > 2 or random.random() > 0.5:
+                for i in range(joins):
+                    if len(self.teams) > 1:
+                        t1 = random.choice(self.teams)
+                        t2 = random.choice(self.teams)
+                        t1.merge_in_team(t2)
         self.prune_teams()
 
     def prune_teams(self):
@@ -69,13 +69,14 @@ class Sim():
 
     def environment_death(self):
         for t in self.tributes:
-            if (t.strength/100.0 * MAX_ENV_SURVIVE_CHANCE < random.random()):
-                t.kill('Environment')
+            if random.random() < ENV_ATTACK_PC:
+                if (t.strength/100.0 * MAX_ENV_SURVIVE_PC < random.random()):
+                    t.kill('Environment')
         self.prune_teams()
 
     def split_team(self):
-        tm = random.choice(self.teams)
         try:
+            tm = random.choice(self.teams)
             tm.split_team()
             self.prune_teams()
         except IndexError:
@@ -91,10 +92,19 @@ class Sim():
         print()
         print('**** EPOCH {} ****'.format(self.ticks))
         self.environment_death()
-        self.join_teams(2)
+        self.join_teams(pc_teams=TEAM_JOIN_EPOCH_PC)
         self.split_team()
         self.apply_fatigue()
         self.print_all_teams()
+
+    def print_final(self):
+        print()
+        print()
+        for t in self.tributes:
+            if t.alive:
+                print('Winner {}'.format(t))
+            else:
+                print('{} {}'.format(t.death_reason, t))
 
 if __name__ == "__main__":
     sim = Sim(100)
@@ -108,3 +118,5 @@ if __name__ == "__main__":
         print('*** The Winner {} ***'.format(sim.tributes_left()[0]))
     else:
         print('*** No Winner This Year ***')
+
+    sim.print_final()
