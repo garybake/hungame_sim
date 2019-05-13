@@ -1,5 +1,6 @@
 import random
 import math
+import logging
 
 from tribute import Tribute
 from team import Team
@@ -37,7 +38,7 @@ class Sim():
         # pc_teams is the percent of teams to merge
         team_count = len(self.teams)
         if team_count > 1:
-            joins = math.ceil(team_count * pc_teams)
+            joins = int(math.ceil(team_count * pc_teams))
             # Low number of teams forces joins to often
             # so we use roll the dice
             if joins > 2 or random.random() > 0.5:
@@ -62,7 +63,7 @@ class Sim():
 
     def print_all_teams(self):
         for team in self.teams:
-            print(team)
+            logging.debug(team)
 
     def game_over(self):
         return len(self.tributes_left()) <= 1
@@ -95,8 +96,8 @@ class Sim():
 
     def epoch(self):
         self.ticks += 1
-        print()
-        print('**** EPOCH {} ****'.format(self.ticks))
+        logging.debug('')
+        logging.debug('**** EPOCH {} ****'.format(self.ticks))
         self.environment_death(self.ticks)
         self.join_teams(pc_teams=TEAM_JOIN_EPOCH_PC)
         self.split_team(self.ticks)
@@ -105,27 +106,10 @@ class Sim():
         self.print_all_teams()
 
     def print_final(self):
-        print()
-        print()
+        logging.debug('')
+        logging.debug('')
         for t in self.tributes:
-            print(t.outcome_str())
+            logging.debug(t.outcome_str())
 
     def collate_results(self):
         return [t.stats() for t in self.tributes]
-
-
-if __name__ == "__main__":
-    sim = Sim(100)
-    sim.print_all_teams()
-
-    while not sim.game_over():
-        sim.epoch()
-
-    print("Epochs: {}".format(sim.ticks))
-    if sim.tributes_left_count() == 1:
-        print('*** The Winner {} ***'.format(sim.tributes_left()[0]))
-    else:
-        print('*** No Winner This Year ***')
-
-    sim.print_final()
-    # print(sim.collate_results())

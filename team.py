@@ -1,4 +1,5 @@
 import random
+import logging
 
 
 class Team():
@@ -50,7 +51,7 @@ class Team():
         return t
 
     def merge_in_team(self, other_team):
-        print('* Merge {}:{} and {}:{} *'.format(self.strength, len(self), other_team.strength, len(other_team)))
+        logging.debug('* Merge {}:{} and {}:{} *'.format(self.strength, len(self), other_team.strength, len(other_team)))
         if other_team == self:
             return
         for t in other_team:
@@ -82,7 +83,7 @@ class Team():
 
         if t1.strength > t1.strength:
             t2.kill_team(tick)
-            print('* Split {}:{} *vs* {}:{} t1 wins *'.format(t1.strength, len(t1), t2.strength, len(t2)))
+            logging.debug('* Split {}:{} *vs* {}:{} t1 wins *'.format(t1.strength, len(t1), t2.strength, len(t2)))
         else:
             t1.kill_team(tick)
-            print('* Split {}:{} *vs* {}:{} t2 wins *'.format(t1.strength, len(t1), t2.strength, len(t2)))
+            logging.debug('* Split {}:{} *vs* {}:{} t2 wins *'.format(t1.strength, len(t1), t2.strength, len(t2)))

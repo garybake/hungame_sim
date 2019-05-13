@@ -1,10 +1,12 @@
 import random
+import logging
 
 
 class Tribute():
     def __init__(self, id):
         self.id = id
-        self.strength = float(random.randint(1, 100))
+        self.initial_strength = float(random.randint(1, 100))
+        self.strength = float(self.initial_strength)
         self.alive = True
         self.death_reason = None
         self.death_tick = None
@@ -18,7 +20,7 @@ class Tribute():
         self.alive = False
         self.death_reason = reason
         self.death_tick = tick
-        print('Death {0}@{1} {2}'.format(self, tick, self.death_reason))
+        logging.debug('Death {0}@{1} {2}'.format(self, tick, self.death_reason))
 
     def fatigue(self, tick=None):
         if not self.alive:
@@ -41,6 +43,7 @@ class Tribute():
     def stats(self):
         return {
             'id': self.id,
+            'initial_strength': self.initial_strength,
             'strength': self.strength,
             'alive': self.alive,
             'led_ticks': self.led_ticks,
