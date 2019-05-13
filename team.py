@@ -17,7 +17,8 @@ class Team():
 
     def __str__(self):
         members = str([t.id for t in self])
-        return 'S: {} \t M: {} '.format(self.strength, members)
+        leader = self.leader
+        return 'S:{0} \t L:{1}  \t M:{2}'.format(self.strength, leader.id, members)
 
     def pop(self):
         if self.is_empty():
@@ -40,6 +41,14 @@ class Team():
     def strength(self):
         return sum([t.strength for t in self])
 
+    @property
+    def leader(self):
+        strongest = self._tributes[0]
+        for t in self._tributes:
+            if t.strength > strongest.strength:
+                strongest = t
+        return t
+
     def merge_in_team(self, other_team):
         print('* Merge {}:{} and {}:{} *'.format(self.strength, len(self), other_team.strength, len(other_team)))
         if other_team == self:
@@ -48,11 +57,11 @@ class Team():
             mt = other_team.pop()
             self.append(mt)
 
-    def kill_team(self):
+    def kill_team(self, tick=None):
         for t in self:
-            t.kill('Team death')
+            t.kill('Team death', tick)
 
-    def split_team(self):
+    def split_team(self, tick=None):
         """
         Split the team and kill the weaker split
         """
@@ -72,8 +81,8 @@ class Team():
             return
 
         if t1.strength > t1.strength:
-            t2.kill_team()
+            t2.kill_team(tick)
             print('* Split {}:{} *vs* {}:{} t1 wins *'.format(t1.strength, len(t1), t2.strength, len(t2)))
         else:
-            t1.kill_team()
+            t1.kill_team(tick)
             print('* Split {}:{} *vs* {}:{} t2 wins *'.format(t1.strength, len(t1), t2.strength, len(t2)))

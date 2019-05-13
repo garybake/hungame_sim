@@ -54,6 +54,12 @@ class Sim():
 
         self.teams = [t for t in self.teams if not t.is_empty()]
 
+    def update_leader_stats(self):
+        for team in self.teams:
+            leader = team.leader
+            if len(team) > 1 and leader.alive:
+                team.leader.led_ticks += 1
+
     def print_all_teams(self):
         for team in self.teams:
             print(team)
@@ -67,44 +73,46 @@ class Sim():
     def tributes_left_count(self):
         return len(self.tributes_left())
 
-    def environment_death(self):
+    def environment_death(self, tick=None):
         for t in self.tributes:
             if random.random() < ENV_ATTACK_PC:
                 if (t.strength/100.0 * MAX_ENV_SURVIVE_PC < random.random()):
-                    t.kill('Environment')
+                    t.kill('Environment', tick)
         self.prune_teams()
 
-    def split_team(self):
+    def split_team(self, tick=None):
         try:
             tm = random.choice(self.teams)
-            tm.split_team()
+            tm.split_team(tick)
             self.prune_teams()
         except IndexError:
             pass
 
-    def apply_fatigue(self):
+    def apply_fatigue(self, tick):
         for t in self.tributes:
-            t.fatigue()
+            t.fatigue(tick)
         self.prune_teams()
 
     def epoch(self):
         self.ticks += 1
         print()
         print('**** EPOCH {} ****'.format(self.ticks))
-        self.environment_death()
+        self.environment_death(self.ticks)
         self.join_teams(pc_teams=TEAM_JOIN_EPOCH_PC)
-        self.split_team()
-        self.apply_fatigue()
+        self.split_team(self.ticks)
+        self.apply_fatigue(self.ticks)
+        self.update_leader_stats()
         self.print_all_teams()
 
     def print_final(self):
         print()
         print()
         for t in self.tributes:
-            if t.alive:
-                print('Winner {}'.format(t))
-            else:
-                print('{} {}'.format(t.death_reason, t))
+            print(t.outcome_str())
+
+    def collate_results(self):
+        return [t.stats() for t in self.tributes]
+
 
 if __name__ == "__main__":
     sim = Sim(100)
@@ -120,3 +128,4 @@ if __name__ == "__main__":
         print('*** No Winner This Year ***')
 
     sim.print_final()
+    # print(sim.collate_results())
