@@ -65,6 +65,7 @@ class Team():
     def split_team(self, tick=None):
         """
         Split the team and kill the weaker split
+        Winner suffers fatigue
         """
         if len(self) <= 1:
             raise IndexError("Team too small")
@@ -84,6 +85,10 @@ class Team():
         if t1.strength > t1.strength:
             t2.kill_team(tick)
             logging.debug('* Split {}:{} *vs* {}:{} t1 wins *'.format(t1.strength, len(t1), t2.strength, len(t2)))
+            for t in t1:
+                t.fatigue(tick)
         else:
             t1.kill_team(tick)
+            for t in t2:
+                t.fatigue(tick)
             logging.debug('* Split {}:{} *vs* {}:{} t2 wins *'.format(t1.strength, len(t1), t2.strength, len(t2)))

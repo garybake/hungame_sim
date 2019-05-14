@@ -113,3 +113,29 @@ class Sim():
 
     def collate_results(self):
         return [t.stats() for t in self.tributes]
+
+    def compressed_result(self):
+        winner = None
+        led_pc = []
+        initial_strength = []
+        for t in self.tributes:
+            if t.alive:
+                wled_pc = t.led_ticks/float(self.ticks)
+                winner = {
+                    'initial_strength': t.initial_strength,
+                    'led_pc': wled_pc
+                }
+            else:
+                led_pc.append(t.led_ticks/float(self.ticks))
+                initial_strength.append(t.initial_strength)
+
+        if winner is None:
+            return None
+        output = {
+            'winner': winner,
+            'loosers': {
+                'initial_strength': sum(initial_strength)/len(initial_strength),
+                'led_pc': sum(led_pc)/len(led_pc)
+            }
+        }
+        return output

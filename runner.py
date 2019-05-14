@@ -3,59 +3,57 @@ import logging
 
 from sim import Sim
 
-TRIBUTE_COUNT = 100 
-
-
-def process_result(r):
-    winner = None
-    led_pc = []
-    initial_strength = []
-    for t in r['tributes']:
-        if t['alive']:
-            wled_pc = t['led_ticks']/float(r['ticks'])
-            winner = {
-                'initial_strength': t['initial_strength'],
-                'led_pc': wled_pc
-            }
-        else:
-            led_pc.append(t['led_ticks']/float(r['ticks']))
-            initial_strength.append(t['initial_strength'])
-
-    if winner is None:
-        return None
-    output = {
-        'winner': winner,
-        'loosers': {
-            'initial_strength': sum(initial_strength)/len(initial_strength),
-            'led_pc': sum(led_pc)/len(led_pc)
-        }
-    }
-    print(output)
-    return output
+SIM_COUNT = 1000
+TRIBUTE_COUNT = 500
 
 
 def run_a_sim(run_id):
-    print('**** Starting run {}'.format(run_id))
+    logging.debug('**** Starting run {}'.format(run_id))
     sim = Sim(TRIBUTE_COUNT)
     while not sim.game_over():
         sim.epoch()
-    print('**** Ending run {}'.format(run_id))
+    logging.debug('**** Ending run {}'.format(run_id))
     output = {
         'run_id': run_id,
-        'tributes': sim.collate_results(),
+        'tributes': sim.compressed_result(),
         'ticks': sim.ticks
     }
     return output
 
 
 def run_multi_sims(sim_count=3):
+    """
+    {
+        run_id: 10
+        tributes: {
+            'winner': {'initial_strength': 37.0, 'led_pc': 0.12},
+            'loosers': {'initial_strength': 53.12, 'led_pc': 0.11}
+        },
+        ticks: 100
+    }
+    """
     results = []
     with Pool() as P:
         results = P.map(run_a_sim, range(sim_count))
-    for r in results:
-        process_result(r)
+    return results
 
 
 if __name__ == "__main__":
-    # logging.debug('gary')
-    run_multi_sims(10)
+    data = {
+        'sim_count': SIM_COUNT,
+        'strongest_win': 0,
+        'leader_win': 0,
+        'fails': 0
+    }
+    results = run_multi_sims(SIM_COUNT)
+    for r in results:
+        try:
+            if r['tributes']['winner']['initial_strength'] > r['tributes']['loosers']['initial_strength']:
+                data['strongest_win'] += 1
+            if r['tributes']['winner']['led_pc'] > r['tributes']['loosers']['led_pc']:
+                data['leader_win'] += 1
+        except TypeError:
+            # print(r)
+            # Usually when there is no winner
+            data['fails'] += 1
+    print(data)
