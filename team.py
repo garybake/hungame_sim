@@ -1,8 +1,10 @@
+"""Holds team class."""
 import random
 import logging
 
 
 class Team():
+    """Collection of tributes."""
 
     def __init__(self, members=None):
         self._tributes = []
@@ -19,7 +21,8 @@ class Team():
     def __str__(self):
         members = str([t.id for t in self])
         leader = self.leader
-        return 'S:{0} \t L:{1}  \t M:{2}'.format(self.strength, leader.id, members)
+        return 'S:{0} \t L:{1}  \t M:{2}'.format(
+            self.strength, leader.id, members)
 
     def pop(self):
         if self.is_empty():
@@ -51,7 +54,8 @@ class Team():
         return t
 
     def merge_in_team(self, other_team):
-        logging.debug('* Merge {}:{} and {}:{} *'.format(self.strength, len(self), other_team.strength, len(other_team)))
+        logging.debug('* Merge {}:{} and {}:{} *'.format(
+            self.strength, len(self), other_team.strength, len(other_team)))
         if other_team == self:
             return
         for t in other_team:
@@ -84,11 +88,13 @@ class Team():
 
         if t1.strength > t1.strength:
             t2.kill_team(tick)
-            logging.debug('* Split {}:{} *vs* {}:{} t1 wins *'.format(t1.strength, len(t1), t2.strength, len(t2)))
+            logging.debug('* Split {}:{} *vs* {}:{} t1 wins *'.format(
+                t1.strength, len(t1), t2.strength, len(t2)))
             for t in t1:
                 t.fatigue(tick)
         else:
             t1.kill_team(tick)
             for t in t2:
                 t.fatigue(tick)
-            logging.debug('* Split {}:{} *vs* {}:{} t2 wins *'.format(t1.strength, len(t1), t2.strength, len(t2)))
+            logging.debug('* Split {}:{} *vs* {}:{} t2 wins *'.format(
+                t1.strength, len(t1), t2.strength, len(t2)))

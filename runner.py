@@ -3,7 +3,7 @@ import logging
 
 from sim import Sim
 
-SIM_COUNT = 1000
+SIM_COUNT = 10
 TRIBUTE_COUNT = 500
 
 
@@ -48,9 +48,11 @@ if __name__ == "__main__":
     results = run_multi_sims(SIM_COUNT)
     for r in results:
         try:
-            if r['tributes']['winner']['initial_strength'] > r['tributes']['loosers']['initial_strength']:
+            ts_winner = r['tributes']['winner']
+            ts_looser = r['tributes']['loosers']
+            if ts_winner['initial_strength'] > ts_looser['initial_strength']:
                 data['strongest_win'] += 1
-            if r['tributes']['winner']['led_pc'] > r['tributes']['loosers']['led_pc']:
+            if ts_winner['led_pc'] > ts_looser['led_pc']:
                 data['leader_win'] += 1
         except TypeError:
             # print(r)

@@ -134,7 +134,8 @@ class Sim():
         output = {
             'winner': winner,
             'loosers': {
-                'initial_strength': sum(initial_strength)/len(initial_strength),
+                'initial_strength':
+                    sum(initial_strength)/len(initial_strength),
                 'led_pc': sum(led_pc)/len(led_pc)
             }
         }
